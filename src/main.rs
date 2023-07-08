@@ -34,19 +34,21 @@ fn main() {
         generation: 1,
     };
 
-    render(&game_board.state, game_board.width);
+    
+    loop {
+        render(&game_board.state, game_board.width);
 
-    next_iteration(
-        &mut game_board.state,
-        game_board.width,
-        game_board.height,
-        &mut game_board.generation,
-    );
+        thread::sleep(time::Duration::from_secs(1));
 
-    thread::sleep(time::Duration::from_secs(1));
-    clear_terminal_screen();
-
-    render(&game_board.state, game_board.width);
+        clear_terminal_screen();
+        
+        next_iteration(
+            &mut game_board.state,
+            game_board.width,
+            game_board.height,
+            &mut game_board.generation,
+        );
+    }
 }
 
 fn clear_terminal_screen() {

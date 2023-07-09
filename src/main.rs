@@ -4,6 +4,8 @@ use std::{thread, time};
 // helpers.rs contains code for all functions and structs that make the game work, but do not contribute to the logic
 pub mod helpers;
 
+// Length of time in milliseconds to sleep before clearing screen, lower values visually look smoother but cause glitching in the terminal
+const SLEEP_TIME: u64 = 250;
 fn main() {
     // Get the command line arguments from user
     let args = helpers::Cli::parse();
@@ -33,7 +35,7 @@ fn run_game(mut game_board: helpers::Board) {
         helpers::render(&game_board.state, game_board.width);
         game_board.alive_cells = helpers::count_alive_cells(&game_board.state);
 
-        thread::sleep(time::Duration::from_secs(1));
+        thread::sleep(time::Duration::from_millis(SLEEP_TIME));
 
         helpers::clear_terminal_screen();
 

@@ -1,5 +1,5 @@
 # Conway's Game of Life - CS50 Final Project
-#### Video Demo: 
+#### Video Demo: https://youtu.be/C3mpG1HyLk0
 #### Description:
 This project is an implementation of [Conway's Game of Life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life) in the [Rust](https://rust-lang.org) programming language.
 

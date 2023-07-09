@@ -60,7 +60,7 @@ pub fn read_board_from_file(filename: String) -> Board {
     let reader = BufReader::new(file);
 
     let mut board: Vec<Vec<u32>> = Vec::new();
-
+    let mut previous_widths: Vec<usize> = Vec::new();
     // Loop individually through every line (row) of the state file
     for (_index, line) in reader.lines().enumerate() {
         let line = match line {
@@ -78,7 +78,12 @@ pub fn read_board_from_file(filename: String) -> Board {
                     .expect("File must contain state in form 0 or 1"),
             );
         }
-
+        previous_widths.push(row.len());
+        for x in &previous_widths {
+            if *x != row.len() {
+                panic!("State file row widths don't match");
+            }
+        }
         board.push(row)
     }
     // Width of the board is the same as the length of the first row
@@ -95,7 +100,7 @@ pub fn read_board_from_file(filename: String) -> Board {
     };
 
     game_board.alive_cells = count_alive_cells(&game_board.state);
-    return game_board;
+    game_board
 }
 
 pub fn clear_terminal_screen() {

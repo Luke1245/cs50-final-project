@@ -45,8 +45,8 @@ fn run_game(mut game_board: helpers::Board) {
         );
     }
     println!(
-        "{} {}",
-        "All cells are dead, game has ended on generation:", game_board.generation
+        "All cells are dead, game has ended on generation: {}",
+        game_board.generation
     );
 }
 

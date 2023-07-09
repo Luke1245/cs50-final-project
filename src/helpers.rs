@@ -2,6 +2,8 @@ use clap::Parser;
 use rand::Rng;
 use colored::Colorize;
 use std::process::Command;
+use std::fs::File;
+use std::io::{BufRead, BufReader};
 
 pub struct Board {
     pub width: u32,
@@ -11,14 +13,19 @@ pub struct Board {
 }
 
 #[derive(Parser)]
+#[clap(version, about="Conway's Game of Life")]
 pub struct Cli {
     /// The width of the board
-    #[arg(short, long)]
+    #[arg(short, long, default_value_t=20)]
     pub width: u32,
 
     /// The height of the board
-    #[arg(short = 't', long)]
+    #[arg(short = 't', long, default_value_t=20)]
     pub height: u32,
+
+    /// File that board state should be read from, leave blank for random board.
+    #[arg(short, long)]
+    pub file: Option<String>,
 }
 
 pub fn initalize_board(width: u32, height: u32) -> Vec<Vec<u32>> {
@@ -38,6 +45,51 @@ pub fn initalize_board(width: u32, height: u32) -> Vec<Vec<u32>> {
         board.push(row);
     }
     board
+}
+
+pub fn read_board_from_file(filename: String) -> Board {
+    // File result refers to the success state of opening the file
+    let file_result = File::open(filename);
+
+    // Only set file if file opened properly
+    let file = match file_result {
+        Ok(file) => file,
+        Err(error) => panic!("Error opening board state file: {:?}", error)
+    };
+    let reader = BufReader::new(file);
+
+    let mut board: Vec<Vec<u32>> = Vec::new();
+
+    // Loop individually through every line (row) of the state file
+    for (_index, line) in reader.lines().enumerate() {
+
+        let line = match line {
+            Ok(line) => line,
+            Err(error) => panic!("Error reading line from board state file: {:?}", error)
+        };
+
+        // Split the row into a vector of each individual character
+        let char_row: Vec<char> = line.chars().collect();
+        let mut row: Vec<u32> = Vec::new();
+        for char in char_row {
+            // Convert char representation of the cell state to u32, make sure its actually an integer
+            row.push(char.to_digit(10).expect("File must contain state in form 0 or 1"));
+        }
+
+        board.push(row)
+    }
+    // Width of the board is the same as the length of the first row
+    let width: u32 = board[0].len().try_into().unwrap();
+    // Height of the board is the same as the length of all the rows
+    let height: u32 = board.len().try_into().unwrap();
+
+    let game_board = Board {
+        width,
+        height,
+        state: board,
+        generation: 1,
+    };
+    return game_board
 }
 
 pub fn clear_terminal_screen() {

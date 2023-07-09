@@ -8,15 +8,28 @@ fn main() {
     // Get the command line arguments from user
     let args = helpers::Cli::parse();
 
-    // Create the initial state of the board
-    let mut game_board = helpers::Board {
-        width: args.width,
-        height: args.height,
-        state: helpers::initalize_board(args.width, args.height),
-        generation: 1,
-    };
-
+    // Check if file flag is set
+    if args.file.is_some() {
+        // Load the game board from the file
+        let game_board: helpers::Board = helpers::read_board_from_file(args.file.unwrap());
+        
+        run_game(game_board)
+    }
+    else {
+        // Create a random board
+        let game_board = helpers::Board {
+            width: args.width,
+            height: args.height,
+            state: helpers::initalize_board(args.width, args.height),
+            generation: 1,
+        };
     
+        run_game(game_board)
+    }
+
+}
+
+fn run_game(mut game_board: helpers::Board) {
     loop {
         helpers::render(&game_board.state, game_board.width);
 

@@ -12,31 +12,31 @@ fn main() {
     if args.file.is_some() {
         // Load the game board from the file
         let game_board: helpers::Board = helpers::read_board_from_file(args.file.unwrap());
-        
+
         run_game(game_board)
-    }
-    else {
+    } else {
         // Create a random board
-        let game_board = helpers::Board {
+        let mut game_board = helpers::Board {
             width: args.width,
             height: args.height,
             state: helpers::initalize_board(args.width, args.height),
             generation: 1,
+            alive_cells: 0,
         };
-    
+        game_board.alive_cells = helpers::count_alive_cells(&game_board.state);
         run_game(game_board)
     }
-
 }
 
 fn run_game(mut game_board: helpers::Board) {
-    loop {
+    while game_board.alive_cells != 0 {
         helpers::render(&game_board.state, game_board.width);
+        game_board.alive_cells = helpers::count_alive_cells(&game_board.state);
 
         thread::sleep(time::Duration::from_secs(1));
 
         helpers::clear_terminal_screen();
-        
+
         next_iteration(
             &mut game_board.state,
             game_board.width,
@@ -44,6 +44,10 @@ fn run_game(mut game_board: helpers::Board) {
             &mut game_board.generation,
         );
     }
+    println!(
+        "{} {}",
+        "All cells are dead, game has ended on generation:", game_board.generation
+    );
 }
 
 fn next_iteration(board: &mut [Vec<u32>], width: u32, height: u32, generation: &mut u64) {
